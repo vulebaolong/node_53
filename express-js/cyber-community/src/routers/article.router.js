@@ -5,7 +5,8 @@ const articleRouter = express.Router()
 
 // http://localhost:3069/api/article/get-list-article
 articleRouter.get("/", articleController.findAll);
-
+articleRouter.get("/:id", articleController.findOne)
+articleRouter.delete("/:id", articleController.delete)
 
 
 

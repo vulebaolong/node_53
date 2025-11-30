@@ -5,4 +5,6 @@ const rootRouter = express.Router()
 
 rootRouter.use("/article", articleRouter)
 
+    
+
 export default rootRouter
