@@ -1,3 +1,4 @@
+import { buildQueryPrisma } from "../common/helpers/build-query-prisma.helper.js";
 import { prisma } from "../common/prisma/conntect.prisma.js";
 import Article from "../models/article.model.js";
 
@@ -13,20 +14,31 @@ export const articleService = {
      *
      */
     async findAll(req) {
-        const { page, pageSize } = req.query;
-        console.log("query", { page, pageSize });
+        const { page, pageSize, where, index } = buildQueryPrisma(req.query);
 
         // prisma
-        const resultPrisma = await prisma.articles.findMany({
-            where: {
-                isDeleted: false,
-            },
+        const resultPrismaPromise = prisma.articles.findMany({
+            where: where,
+            skip: index, // skip tới vị trí index nào (OFFSET)
+            take: pageSize, // take lấy bao nhiêu phần tử (LIMIT)
         });
 
-        // sequelize
-        const resultSequelize = await Article.findAll();
+        const totalItemPromise = prisma.articles.count({
+            where: where,
+        });
 
-        return resultPrisma;
+        const [resultPrisma, totalItem] = await Promise.all([resultPrismaPromise, totalItemPromise]);
+
+        // sequelize
+        // const resultSequelize = await Article.findAll();
+
+        return {
+            page: page,
+            pageSize: pageSize,
+            totalItem: totalItem,
+            totalPage: Math.ceil(totalItem / pageSize),
+            items: resultPrisma,
+        };
     },
 
     /**
@@ -75,5 +87,41 @@ export const articleService = {
         });
 
         return true;
+    },
+
+    /**
+     * Body
+     * Thường dùng: FE gửi dữ liệu nhiều, tạo mới, xử lý .....
+     */
+    async create(req) {
+        console.log("body", req.body);
+        const { title, content } = req.body;
+
+        const articleNew = await prisma.articles.create({
+            data: {
+                title: title,
+                content: content,
+                userId: 1,
+            },
+        });
+
+        return articleNew;
+    },
+
+    async update(req) {
+        const { id } = req.params;
+        const { title, content, id: id1 } = req.body;
+
+        const articleUpdate = await prisma.articles.update({
+            where: {
+                id: +id,
+            },
+            data: {
+                content: content,
+                title: title,
+            },
+        });
+
+        return articleUpdate;
     },
 };

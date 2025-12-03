@@ -17,4 +17,14 @@ export const articleController = {
         const response = responseSuccess(result, "Delete article success");
         res.status(response.statusCode).json(response);
     },
+    async create(req, res, next) {
+        const result = await articleService.create(req);
+        const response = responseSuccess(result, "Create article success");
+        res.status(response.statusCode).json(response);
+    },
+    async update(req, res, next) {
+        const result = await articleService.update(req);
+        const response = responseSuccess(result, "Update article success");
+        res.status(response.statusCode).json(response);
+    },
 };
