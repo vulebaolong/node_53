@@ -14,6 +14,7 @@ export const articleService = {
      *
      */
     async findAll(req) {
+        console.log("service findAll",req.payload);
         const { page, pageSize, where, index } = buildQueryPrisma(req.query);
 
         // prisma

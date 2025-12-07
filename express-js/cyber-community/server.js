@@ -1,6 +1,7 @@
 import express from "express";
 import rootRouter from "./src/routers/root.router.js";
 import cors from "cors";
+import { appErorr } from "./src/common/helpers/handle-error.helper.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(
 );
 
 app.use("/api", rootRouter);
+app.use(appErorr)
 
 const port = 3069;
 app.listen(port, () => {
