@@ -13,9 +13,13 @@ authRouter.get("/get-info", protect, authController.getInfo);
 // người dùng click button google
 // kích hoạt logic của passport, để pasport xử lý với google, cùng với yêu cầu tôi muốn lấy email, và profile của người dùng
 // sau khi passport làm việc với google xong, passport sẽ tự redirect người dùng tới trang đăng nhập google
-authRouter.get("/google", passport.authenticate("google", { scope: ["email", "profile"] }))
+authRouter.get("/google", passport.authenticate("google", { scope: ["email", "profile"] }));
 
-authRouter.get("/google-callback", (req, res) => { res.json("hello zui zui") })
+// Sau khi người dùng chọn tài khoản gmail và đồng ý với bên google
+// Passport sẽ lấy code và xử lý với bên google => lấy thông tin gmail => kích hoạt hàm verify ở trong src/common/passport/login-google.passport.js
+authRouter.get("/google-callback", passport.authenticate("google", { failureRedirect: "/login", session: false }), authController.googleCallback);
+
+authRouter.post("/refresh-token", authController.refreshToken)
 
 // Tạo route CRUD
 // authRouter.post("/", authController.create);

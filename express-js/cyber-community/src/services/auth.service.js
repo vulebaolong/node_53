@@ -1,4 +1,4 @@
-import { BadRequestException } from "../common/helpers/exception.helper.js";
+import { BadRequestException, UnauthorizedException } from "../common/helpers/exception.helper.js";
 import { prisma } from "../common/prisma/conntect.prisma.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
@@ -79,10 +79,54 @@ export const authService = {
     },
 
     async getInfo(req) {
+        delete req.user.password;
 
-        delete req.user.password
-        
         return req.user;
+    },
+
+    async googleCallback(req) {
+        // console.log("user google", req.user);
+
+        const { accessToken, refreshToken } = tokenSerivce.createTokens(req.user.id);
+        // console.log({ accessToken, refreshToken });
+
+        // truyền AT và RT trong query url của FE
+        // FE dùng hook  useSearchParams(); để lấy AT và RT
+        const urlRedirect = `http://localhost:3000/login-callback?accessToken=${accessToken}&refreshToken=${refreshToken}`;
+        return urlRedirect;
+    },
+
+    async refreshToken(req) {
+        const { accessToken, refreshToken } = req.body;
+
+        // accessToken: đang bị hết hạn
+        // verify accessToken phải loại trừ hết hạn
+        const decodeAccessToken = tokenSerivce.verifyAccessToken(accessToken, { ignoreExpiration: true });
+        const decodeRefreshToken = tokenSerivce.verifyRefreshToken(refreshToken);
+
+        if (decodeAccessToken.userId !== decodeRefreshToken.userId) {
+            throw new UnauthorizedException("Refresh Token Invalid");
+        }
+
+        const userExits = await prisma.users.findUnique({
+            where: {
+                id: decodeRefreshToken.userId,
+            },
+        });
+        if(!userExits) {
+            throw new UnauthorizedException("Không có người dùng")
+        }
+
+        // Trường hợp: trả 2 token
+        // refreshToken (1d) sẽ được làm mới (rotate): chỉ cần trong 1 ngày mà người dùng không đăng nhập => logout
+        const tokens = tokenSerivce.createTokens(userExits.id)
+
+        // Trường hợp: trả 1 token (accessToken)
+        // refreshToken KHÔNG được làm mới: thời gian sống bao nhiêu thì trạng thái đăng nhập giữ được bấy nhiêu
+
+        // console.log({ accessToken, refreshToken });
+
+        return tokens;
     },
 
     async create(req) {
