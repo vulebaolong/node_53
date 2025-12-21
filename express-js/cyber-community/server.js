@@ -7,6 +7,11 @@ import { initGoogleStrategy } from "./src/common/passport/login-google.passport.
 
 const app = express();
 
+// IMPORTANT: né thiết lập root static là dấu chấm
+// vì sẽ bị lộ tất cả mọi thứ (srouce code) nếu bot của hacker gọi
+app.use(express.static("./public"))
+
+// parser json để body có dữ liệu
 app.use(express.json());
 app.use(
     cors({
