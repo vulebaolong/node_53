@@ -2,7 +2,7 @@ import { BadRequestException, UnauthorizedException } from "../common/helpers/ex
 import { prisma } from "../common/prisma/conntect.prisma.js";
 import bcrypt from "bcrypt";
 import jsonwebtoken from "jsonwebtoken";
-import { tokenSerivce } from "./token.service.js";
+import { tokenService } from "./token.service.js";
 
 export const authService = {
     async register(req) {
@@ -71,7 +71,7 @@ export const authService = {
         // Encrypt: MÃ HOÁ
         // mã hoá 2 chiều: CÓ THỂ DỊCH NGƯỢC
 
-        const tokens = tokenSerivce.createTokens(userExits.id);
+        const tokens = tokenService.createTokens(userExits.id);
 
         console.log({ email, password, userExits });
 
@@ -87,7 +87,7 @@ export const authService = {
     async googleCallback(req) {
         // console.log("user google", req.user);
 
-        const { accessToken, refreshToken } = tokenSerivce.createTokens(req.user.id);
+        const { accessToken, refreshToken } = tokenService.createTokens(req.user.id);
         // console.log({ accessToken, refreshToken });
 
         // truyền AT và RT trong query url của FE
@@ -101,8 +101,8 @@ export const authService = {
 
         // accessToken: đang bị hết hạn
         // verify accessToken phải loại trừ hết hạn
-        const decodeAccessToken = tokenSerivce.verifyAccessToken(accessToken, { ignoreExpiration: true });
-        const decodeRefreshToken = tokenSerivce.verifyRefreshToken(refreshToken);
+        const decodeAccessToken = tokenService.verifyAccessToken(accessToken, { ignoreExpiration: true });
+        const decodeRefreshToken = tokenService.verifyRefreshToken(refreshToken);
 
         if (decodeAccessToken.userId !== decodeRefreshToken.userId) {
             throw new UnauthorizedException("Refresh Token Invalid");
@@ -119,7 +119,7 @@ export const authService = {
 
         // Trường hợp: trả 2 token
         // refreshToken (1d) sẽ được làm mới (rotate): chỉ cần trong 1 ngày mà người dùng không đăng nhập => logout
-        const tokens = tokenSerivce.createTokens(userExits.id)
+        const tokens = tokenService.createTokens(userExits.id)
 
         // Trường hợp: trả 1 token (accessToken)
         // refreshToken KHÔNG được làm mới: thời gian sống bao nhiêu thì trạng thái đăng nhập giữ được bấy nhiêu

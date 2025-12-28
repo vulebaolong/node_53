@@ -370,3 +370,49 @@ VALUES
 		'2024-01-10 17:00:00'
 	);
 
+CREATE TABLE
+	IF NOT EXISTS `ChatGroups` (
+		`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		--
+		`name` VARCHAR(255),
+		`ownerId` INT,
+		FOREIGN KEY (`ownerId`) REFERENCES `Users` (`id`),
+		-- 
+		`isDeleted` TINYINT (1) NOT NULL DEFAULT 0,
+		`createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	);
+
+CREATE TABLE
+	IF NOT EXISTS `ChatGroupMembers` (
+		`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		--
+		`userId` INT,
+		FOREIGN KEY (`userId`) REFERENCES `Users` (`id`),
+		`chatGroupId` INT,
+		FOREIGN KEY (`chatGroupId`) REFERENCES `ChatGroups` (`id`),
+		-- 
+		`isDeleted` TINYINT (1) NOT NULL DEFAULT 0,
+		`createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	);
+
+CREATE TABLE
+	IF NOT EXISTS `ChatMessages` (
+		`id` INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		--
+		`messageText` TEXT,
+		
+		`chatGroupId` INT NOT NULL, -- not null để đảm bảo tin nhắn phải nằm trong 1 nhóm nào đó (không được bơ vơ)
+		FOREIGN KEY (`chatGroupId`) REFERENCES `ChatGroups` (`id`),
+		
+		`userIdSender` INT NOT NULL, -- not null để đảm bảo 1 tín nhắn phải có chủ nhân
+		FOREIGN KEY (`userIdSender`) REFERENCES `Users` (`id`),
+		-- 
+		`isDeleted` TINYINT (1) NOT NULL DEFAULT 0,
+		`createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		`updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	);
+
+
+

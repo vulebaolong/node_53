@@ -162,6 +162,34 @@ exports.Prisma.UsersScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ChatGroupMembersScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  chatGroupId: 'chatGroupId',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChatGroupsScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  ownerId: 'ownerId',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChatMessagesScalarFieldEnum = {
+  id: 'id',
+  messageText: 'messageText',
+  chatGroupId: 'chatGroupId',
+  userIdSender: 'userIdSender',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -191,12 +219,23 @@ exports.Prisma.UsersOrderByRelevanceFieldEnum = {
   googleId: 'googleId'
 };
 
+exports.Prisma.ChatGroupsOrderByRelevanceFieldEnum = {
+  name: 'name'
+};
+
+exports.Prisma.ChatMessagesOrderByRelevanceFieldEnum = {
+  messageText: 'messageText'
+};
+
 
 exports.Prisma.ModelName = {
   Articles: 'Articles',
   Foods: 'Foods',
   Orders: 'Orders',
-  Users: 'Users'
+  Users: 'Users',
+  ChatGroupMembers: 'ChatGroupMembers',
+  ChatGroups: 'ChatGroups',
+  ChatMessages: 'ChatMessages'
 };
 
 /**

@@ -1,15 +1,18 @@
+
 import express from "express";
 import rootRouter from "./src/routers/root.router.js";
 import cors from "cors";
 import { appErorr } from "./src/common/helpers/handle-error.helper.js";
 import { NotFoundException } from "./src/common/helpers/exception.helper.js";
 import { initGoogleStrategy } from "./src/common/passport/login-google.passport.js";
+import { createServer } from "http";
+import { initSocket } from "./src/common/socket/init.socket.js";
 
 const app = express();
 
 // IMPORTANT: né thiết lập root static là dấu chấm
 // vì sẽ bị lộ tất cả mọi thứ (srouce code) nếu bot của hacker gọi
-app.use(express.static("./public"))
+app.use(express.static("./public"));
 
 // parser json để body có dữ liệu
 app.use(express.json());
@@ -19,7 +22,7 @@ app.use(
     })
 );
 
-initGoogleStrategy()
+initGoogleStrategy();
 
 app.use("/api", rootRouter);
 app.use((req, res, next) => {
@@ -32,8 +35,11 @@ app.use((req, res, next) => {
 });
 app.use(appErorr);
 
+const httpServer = createServer(app);
+initSocket(httpServer)
+
 const port = 3069;
-app.listen(port, () => {
+httpServer.listen(port, () => {
     console.log(`🤷 Server online at: ${port}`);
 });
 

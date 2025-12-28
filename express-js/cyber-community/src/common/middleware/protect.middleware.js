@@ -1,4 +1,4 @@
-import { tokenSerivce } from "../../services/token.service.js";
+import { tokenService } from "../../services/token.service.js";
 import { UnauthorizedException } from "../helpers/exception.helper.js";
 import { prisma } from "../prisma/conntect.prisma.js";
 
@@ -16,7 +16,7 @@ export const protect = async (req, res, next) => {
         throw new UnauthorizedException("Không có token");
     }
 
-    const { userId } = tokenSerivce.verifyAccessToken(token);
+    const { userId } = tokenService.verifyAccessToken(token);
 
     const userExits = await prisma.users.findUnique({
         where: {

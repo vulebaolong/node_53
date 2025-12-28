@@ -4,6 +4,7 @@ import cloudinary from "../common/cloudinary/init.cloudinary.js";
 import { FOLDER_IMAGE } from "../common/constant/app.constant.js";
 import { BadRequestException } from "../common/helpers/exception.helper.js";
 import { prisma } from "../common/prisma/conntect.prisma.js";
+import { buildQueryPrisma } from "../common/helpers/build-query-prisma.helper.js";
 
 export const userService = {
     async avatarLocal(req) {
@@ -104,11 +105,41 @@ export const userService = {
     },
 
     async findAll(req) {
-        return `This action returns all user`;
+        // console.log("service findAll", req.payload);
+        const { page, pageSize, where, index } = buildQueryPrisma(req.query);
+
+        // prisma
+        const resultPrismaPromise = prisma.users.findMany({
+            where: where,
+            skip: index, // skip tới vị trí index nào (OFFSET)
+            take: pageSize, // take lấy bao nhiêu phần tử (LIMIT)
+        });
+
+        const totalItemPromise = prisma.users.count({
+            where: where,
+        });
+
+        const [resultPrisma, totalItem] = await Promise.all([resultPrismaPromise, totalItemPromise]);
+
+        // sequelize
+        // const resultSequelize = await Article.findAll();
+
+        return {
+            page: page,
+            pageSize: pageSize,
+            totalItem: totalItem,
+            totalPage: Math.ceil(totalItem / pageSize),
+            items: resultPrisma,
+        };
     },
 
     async findOne(req) {
-        return `This action returns a id: ${req.params.id} user`;
+      const user = await  prisma.users.findUnique({
+            where: {
+                id: +req.params.id
+            }
+        })
+        return user
     },
 
     async update(req) {
