@@ -7,6 +7,10 @@ import { NotFoundException } from "./src/common/helpers/exception.helper.js";
 import { initGoogleStrategy } from "./src/common/passport/login-google.passport.js";
 import { createServer } from "http";
 import { initSocket } from "./src/common/socket/init.socket.js";
+import { setupSwagger } from "./src/common/swagger/swagger.config.js";
+// Import hàm setupGraphQL để setup GraphQL endpoint
+// setupGraphQL: Hàm tạo endpoint /graphql và setup GraphiQL UI
+import { setupGraphQL } from "./src/graphql/graphql.config.js";
 
 const app = express();
 
@@ -24,13 +28,33 @@ app.use(
 
 initGoogleStrategy();
 
+// Setup Swagger UI - Phải đặt trước các routes khác
+setupSwagger(app);
+
+// Setup GraphQL endpoint - Phải đặt trước các routes khác
+// setupGraphQL(app): Tạo endpoint /graphql và setup GraphiQL UI
+// Phải đặt trước các routes khác để không bị conflict
+setupGraphQL(app);
+
 app.use("/api", rootRouter);
+
+// Middleware xử lý các route không tìm thấy (404)
 app.use((req, res, next) => {
     const method = req.method;
     const url = req.originalUrl;
     const ip = req.ip;
+    
+    // Bỏ qua các request không quan trọng (favicon, robots.txt, etc.)
+    // Browser tự động request favicon.ico khi truy cập trang web
+    // Không cần throw error cho những request này
+    if (url === '/favicon.ico' || url === '/robots.txt') {
+        return res.status(404).end(); // Trả về 404 một cách im lặng
+    }
+    
+    // Log các request khác để debug
     console.log(`${method} ${url} ${ip}`);
-
+    
+    // Throw NotFoundException cho các route không tồn tại
     throw new NotFoundException();
 });
 app.use(appErorr);

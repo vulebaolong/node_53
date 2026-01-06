@@ -1,0 +1,124 @@
+# GraphQL Query Examples
+# Copy và paste các query này vào GraphiQL để test
+
+# ============================================
+# 1. QUERY - Lấy danh sách bài viết (có phân trang)
+# ============================================
+query GetArticles {
+  articles(page: 1, pageSize: 10) {
+    page
+    pageSize
+    totalItem
+    totalPage
+    items {
+      id
+      title
+      content
+      views
+      createdAt
+    }
+  }
+}
+
+# ============================================
+# 2. QUERY - Lấy danh sách bài viết (chỉ lấy title và content)
+# ============================================
+query GetArticlesSimple {
+  articles(page: 1, pageSize: 5) {
+    items {
+      title
+      content
+    }
+  }
+}
+
+# ============================================
+# 3. QUERY - Lấy một bài viết theo ID
+# ============================================
+query GetArticle {
+  article(id: 1) {
+    id
+    title
+    content
+    imageUrl
+    views
+    createdAt
+    updatedAt
+  }
+}
+
+# ============================================
+# 4. MUTATION - Tạo bài viết mới
+# ============================================
+mutation CreateArticle {
+  createArticle(
+    title: "Bài viết mới từ GraphQL"
+    content: "Đây là nội dung bài viết được tạo bằng GraphQL mutation"
+    imageUrl: "https://example.com/image.jpg"
+  ) {
+    id
+    title
+    content
+    createdAt
+  }
+}
+
+# ============================================
+# 5. MUTATION - Cập nhật bài viết (chỉ update title)
+# ============================================
+mutation UpdateArticleTitle {
+  updateArticle(
+    id: 1
+    title: "Tiêu đề đã được cập nhật"
+  ) {
+    id
+    title
+    content
+  }
+}
+
+# ============================================
+# 6. MUTATION - Cập nhật bài viết (update cả title và content)
+# ============================================
+mutation UpdateArticleFull {
+  updateArticle(
+    id: 1
+    title: "Tiêu đề mới"
+    content: "Nội dung mới"
+  ) {
+    id
+    title
+    content
+    updatedAt
+  }
+}
+
+# ============================================
+# 7. MUTATION - Xóa bài viết (soft delete)
+# ============================================
+mutation DeleteArticle {
+  deleteArticle(id: 1)
+}
+
+# ============================================
+# 8. QUERY - Lấy danh sách với nhiều thông tin
+# ============================================
+query GetArticlesDetailed {
+  articles(page: 1, pageSize: 3) {
+    page
+    pageSize
+    totalItem
+    totalPage
+    items {
+      id
+      title
+      content
+      imageUrl
+      views
+      userId
+      createdAt
+      updatedAt
+    }
+  }
+}
+
