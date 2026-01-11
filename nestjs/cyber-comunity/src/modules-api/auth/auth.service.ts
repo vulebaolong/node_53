@@ -45,7 +45,7 @@ export class AuthService {
 
     const tokens = this.tokenService.createTokens(userExits.id);
 
-    console.log({ email, password, userExits });
+    // console.log({ email, password, userExits });
 
     return tokens;
   }

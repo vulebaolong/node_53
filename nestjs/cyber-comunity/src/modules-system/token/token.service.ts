@@ -25,11 +25,11 @@ export class TokenService {
     };
   }
 
-  verifyAccessToken(accessToken, option) {
+  verifyAccessToken(accessToken: string, options?: jsonwebtoken.VerifyOptions) {
     const decode = jsonwebtoken.verify(
       accessToken,
       ACCESS_TOKEN_SECRET as string,
-      option,
+      options,
     );
     return decode;
   }

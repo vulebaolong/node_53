@@ -8,11 +8,13 @@ import {
   Delete,
   Query,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { ProtectGuard } from 'src/common/guards/protect.guard';
 
 @Controller('article')
 @UseInterceptors(CacheInterceptor)
@@ -26,6 +28,7 @@ export class ArticleController {
 
   @Get()
   @CacheTTL(50000)
+  // @UseGuards(ProtectGuard)
   findAll(@Query() query) {
     return this.articleService.findAll(query);
   }

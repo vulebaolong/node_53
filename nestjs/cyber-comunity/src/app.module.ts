@@ -8,6 +8,11 @@ import { TokenModule } from './modules-system/token/token.module';
 import { ArticleModule } from './modules-api/article/article.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
+import { DATABASE_REDIS } from './common/constant/app.constant';
+import { APP_GUARD } from '@nestjs/core';
+import { ProtectGuard } from './common/guards/protect.guard';
+import { SearchAppModule } from './modules-api/search-app/search-app.module';
+import { ElasticSearchModule } from './modules-system/elastic-search/elastic-search.module';
 
 @Module({
   imports: [
@@ -18,10 +23,18 @@ import KeyvRedis from '@keyv/redis';
     ArticleModule,
     CacheModule.register({
       isGlobal: true,
-      stores: [new KeyvRedis('redis://localhost:6381')],
+      stores: [new KeyvRedis(DATABASE_REDIS)],
     }),
+    SearchAppModule,
+    ElasticSearchModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ProtectGuard,
+    },
+  ],
 })
 export class AppModule {}
