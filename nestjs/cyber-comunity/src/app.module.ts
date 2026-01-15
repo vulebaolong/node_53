@@ -13,6 +13,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { ProtectGuard } from './common/guards/protect.guard';
 import { SearchAppModule } from './modules-api/search-app/search-app.module';
 import { ElasticSearchModule } from './modules-system/elastic-search/elastic-search.module';
+import { OrderModule } from './modules-api/order/order.module';
+import { RabbitMQModule } from './modules-system/rabbit-mq/rabbit-mq.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { ElasticSearchModule } from './modules-system/elastic-search/elastic-sea
     }),
     SearchAppModule,
     ElasticSearchModule,
+    OrderModule,
+    RabbitMQModule,
   ],
   controllers: [AppController],
   providers: [

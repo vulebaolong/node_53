@@ -11,12 +11,14 @@ import { TokenExpiredError } from 'jsonwebtoken';
 import { TokenService } from 'src/modules-system/token/token.service';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { Reflector } from '@nestjs/core';
+import { PrismaService } from 'src/modules-system/prisma/prisma.service';
 
 @Injectable()
 export class ProtectGuard implements CanActivate {
   constructor(
     private tokenService: TokenService,
     private reflector: Reflector,
+    private prisma: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -48,7 +50,19 @@ export class ProtectGuard implements CanActivate {
       const payload = await this.tokenService.verifyAccessToken(token);
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['user'] = payload;
+
+      // console.log({ payload });
+
+      const userExits = await this.prisma.users.findUnique({
+        where: {
+          id: (payload as any).userId,
+        },
+      });
+      if (!userExits) {
+        throw new UnauthorizedException('Không tìm thấy user');
+      }
+
+      request['user'] = userExits;
     } catch (err) {
       console.log(`[ProtectGuard] - `, err);
       switch (err.constructor) {
