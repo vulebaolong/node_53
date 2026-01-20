@@ -1,5 +1,6 @@
 import { Global, Inject, Module, OnModuleInit } from '@nestjs/common';
 import { ClientProxy, ClientsModule, Transport } from '@nestjs/microservices';
+import { RABNIT_MQ_URL } from 'src/common/constant/app.constant';
 
 @Global()
 @Module({
@@ -9,7 +10,7 @@ import { ClientProxy, ClientsModule, Transport } from '@nestjs/microservices';
         name: 'ORDER_SERVICE',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://user:12345@localhost:5672'],
+          urls: [RABNIT_MQ_URL!],
           queue: 'order_queue',
           queueOptions: {
             durable: false, // queue có tồn tại sau khi RabbitMQ restart hay không: false là không
@@ -30,7 +31,13 @@ import { ClientProxy, ClientsModule, Transport } from '@nestjs/microservices';
 export class RabbitMQModule implements OnModuleInit {
   constructor(@Inject('ORDER_SERVICE') private client: ClientProxy) {}
 
-  onModuleInit() {
-    this.client.connect();
+  async onModuleInit() {
+    // kiểm tra kết nối
+    try {
+      await this.client.connect();
+      console.log('✅ Rabbit-MQ connected');
+    } catch (error) {
+      console.log('❌ Rabbit-MQ failed', error);
+    }
   }
 }

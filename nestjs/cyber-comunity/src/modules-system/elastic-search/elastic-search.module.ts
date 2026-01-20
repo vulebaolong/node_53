@@ -1,20 +1,40 @@
-import { Global, Module } from '@nestjs/common';
-import { ElasticsearchModule, ElasticsearchService } from '@nestjs/elasticsearch';
+import { Global, Module, OnModuleInit } from '@nestjs/common';
+import {
+  ElasticsearchModule,
+  ElasticsearchService,
+} from '@nestjs/elasticsearch';
+import {
+  ELASTIC_SEARCH_PASSWORD,
+  ELASTIC_SEARCH_URL,
+  ELASTIC_SEARCH_USERNAME,
+} from 'src/common/constant/app.constant';
 
 @Global()
 @Module({
   imports: [
     ElasticsearchModule.register({
-      node: 'https://localhost:9200',
+      node: ELASTIC_SEARCH_URL,
       auth: {
-        username: 'elastic',
-        password: 'YZ8R9ODqu_JcO5RM6mJ8',
+        username: ELASTIC_SEARCH_USERNAME!,
+        password: ELASTIC_SEARCH_PASSWORD!,
       },
       tls: {
         rejectUnauthorized: false,
       },
     }),
   ],
-  exports: [ElasticsearchModule]
+  exports: [ElasticsearchModule],
 })
-export class ElasticSearchModule {}
+export class ElasticSearchModule implements OnModuleInit {
+  constructor(private elasticSearch: ElasticsearchService) {}
+
+  async onModuleInit() {
+    // Kiểm tra kết nối
+    try {
+      const result = await this.elasticSearch.ping();
+      console.log('✅ ElasticSearch connected', result);
+    } catch (error) {
+      console.log('❌ ElasticSearch failed', error);
+    }
+  }
+}

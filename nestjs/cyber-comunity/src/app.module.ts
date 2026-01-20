@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Inject, Module, OnModuleInit } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules-api/auth/auth.module';
@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './modules-system/prisma/prisma.module';
 import { TokenModule } from './modules-system/token/token.module';
 import { ArticleModule } from './modules-api/article/article.module';
-import { CacheModule } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { DATABASE_REDIS } from './common/constant/app.constant';
 import { APP_GUARD } from '@nestjs/core';
@@ -41,4 +41,16 @@ import { RabbitMQModule } from './modules-system/rabbit-mq/rabbit-mq.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  // import { Cache } from '@nestjs/cache-manager';
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+
+  async onModuleInit() {
+    try {
+      await this.cacheManager.get("healthcheck")
+      console.log("✅ Redis Cache connected");
+    } catch (error) {
+      console.log('❌ Redis Cache Failed');
+    }
+  }
+}
