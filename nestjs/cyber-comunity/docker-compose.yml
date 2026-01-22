@@ -18,6 +18,10 @@ services:
   elasticsearch:
     container_name: con-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.3
+    # Không yêu cầu mật khẩu
+    # environment:
+    #   - discovery.type=single-node
+    #   - xpack.security.enabled=false
     ports:
       - 9200:9200
     mem_limit: 1g
@@ -53,5 +57,17 @@ services:
     image: vulebaolong/img-cyber_community:latest
     ports:
       - 3070:3069
+    env_file:
+      - .env
+
+  be-email:
+    container_name: con-cyber_email
+    image: vulebaolong/img-cyber_email:latest
+    env_file:
+      - .env
+
+  be-order:
+    container_name: con-cyber_order
+    image: vulebaolong/img-cyber_order:latest
     env_file:
       - .env
